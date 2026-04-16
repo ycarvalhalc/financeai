@@ -1,11 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import type { Expense } from "@/lib/types";
-import { SEED_CATEGORIES } from "@/lib/mocks/seed";
+import type { Category, Expense } from "@/lib/types";
 import { formatBRL } from "@/lib/format";
 
-function buildInsights(expenses: Expense[]): string[] {
+function buildInsights(expenses: Expense[], categories: Category[]): string[] {
   if (expenses.length === 0) {
     return [
       "Cadastre despesas para que a IA possa identificar padrões e sugerir economia.",
@@ -15,7 +14,7 @@ function buildInsights(expenses: Expense[]): string[] {
   const total = expenses.reduce((s, e) => s + e.amount, 0);
   const byCat = new Map<string, number>();
   for (const e of expenses) {
-    const cat = SEED_CATEGORIES.find((c) => c.id === e.categoryId)?.name ?? "Outros";
+    const cat = categories.find((c) => c.id === e.categoryId)?.name ?? "Outros";
     byCat.set(cat, (byCat.get(cat) ?? 0) + e.amount);
   }
   const sorted = Array.from(byCat.entries()).sort((a, b) => b[1] - a[1]);
@@ -39,12 +38,14 @@ export function AiInsightsModal({
   open,
   onClose,
   expenses,
+  categories,
 }: {
   open: boolean;
   onClose: () => void;
   expenses: Expense[];
+  categories: Category[];
 }) {
-  const insights = useMemo(() => buildInsights(expenses), [expenses]);
+  const insights = useMemo(() => buildInsights(expenses, categories), [expenses, categories]);
 
   if (!open) return null;
 
@@ -68,7 +69,7 @@ export function AiInsightsModal({
             <h2 id="ai-modal-title" className="font-display mt-1 text-2xl text-foreground">
               Recomendações do mês
             </h2>
-            <p className="mt-1 text-sm text-muted">Análise mockada com base nos seus lançamentos atuais.</p>
+            <p className="mt-1 text-sm text-muted">Análise determinística com base nos seus lançamentos atuais.</p>
           </div>
           <button
             type="button"

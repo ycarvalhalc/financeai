@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { z } from "zod";
-import type { Expense, ExpenseType } from "@/lib/types";
-import { SEED_CATEGORIES } from "@/lib/mocks/seed";
+import type { Category, Expense, ExpenseType } from "@/lib/types";
 
 const schema = z.object({
   title: z.string().trim().min(1, "Informe o título"),
@@ -16,6 +15,7 @@ const schema = z.object({
 });
 
 type Props = {
+  categories: Category[];
   initial?: Partial<Expense>;
   submitLabel: string;
   /** Se definido, exibe botão Cancelar que chama esta função em vez do link para /expenses. */
@@ -30,11 +30,11 @@ type Props = {
   }) => Promise<void> | void;
 };
 
-export function ExpenseForm({ initial, submitLabel, onCancel, onSubmit }: Props) {
+export function ExpenseForm({ categories, initial, submitLabel, onCancel, onSubmit }: Props) {
   const [title, setTitle] = useState(initial?.title ?? "");
   const [amount, setAmount] = useState(initial?.amount?.toString() ?? "");
   const [date, setDate] = useState(initial?.date ?? new Date().toISOString().slice(0, 10));
-  const [categoryId, setCategoryId] = useState(initial?.categoryId ?? SEED_CATEGORIES[0]?.id ?? "");
+  const [categoryId, setCategoryId] = useState(initial?.categoryId ?? categories[0]?.id ?? "");
   const [type, setType] = useState<ExpenseType>(initial?.type ?? "pontual");
   const [recurring, setRecurring] = useState(initial?.recurring?.active ?? false);
   const [dayOfMonth, setDayOfMonth] = useState(
@@ -136,8 +136,9 @@ export function ExpenseForm({ initial, submitLabel, onCancel, onSubmit }: Props)
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
           className="w-full rounded-xl border border-[var(--border)] bg-background px-4 py-3 text-foreground focus-ring"
+          disabled={categories.length === 0}
         >
-          {SEED_CATEGORIES.map((c) => (
+          {categories.map((c) => (
             <option key={c.id} value={c.id}>
               {c.name}
             </option>
@@ -179,7 +180,7 @@ export function ExpenseForm({ initial, submitLabel, onCancel, onSubmit }: Props)
                 onChange={(e) => setRecurring(e.target.checked)}
                 className="accent-accent"
               />
-              Repetição mensal automática (mock)
+              Repetição mensal automática
             </label>
             {recurring && (
               <div>

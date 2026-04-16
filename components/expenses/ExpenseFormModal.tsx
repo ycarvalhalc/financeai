@@ -16,7 +16,7 @@ type Props = {
 
 export function ExpenseFormModal({ open, onClose, mode, expense }: Props) {
   const { user } = useSession();
-  const { createExpense, updateExpense } = useExpenses();
+  const { createExpense, updateExpense, categories } = useExpenses();
   const [createKey, setCreateKey] = useState(0);
 
   useEffect(() => {
@@ -33,21 +33,26 @@ export function ExpenseFormModal({ open, onClose, mode, expense }: Props) {
     <Modal open={open} onClose={onClose} title={title} size="lg">
       <p className="mb-6 text-sm text-muted">
         {mode === "create"
-          ? "Lance gastos pontuais ou recorrentes. Os dados ficam salvos neste navegador (mock)."
+          ? "Lance gastos pontuais ou recorrentes. Os dados são salvos na sua conta."
           : "Ajuste os campos e salve para atualizar o lançamento."}
       </p>
       <ExpenseForm
+        categories={categories}
         key={mode === "edit" && expense ? expense.id : `new-${createKey}`}
         initial={mode === "edit" ? expense : undefined}
         submitLabel={mode === "create" ? "Salvar despesa" : "Salvar alterações"}
         onCancel={onClose}
-        onSubmit={(data) => {
-          if (mode === "create") {
-            createExpense(user.id, data);
-          } else if (expense) {
-            updateExpense(expense.id, user.id, data);
+        onSubmit={async (data) => {
+          try {
+            if (mode === "create") {
+              await createExpense(user.id, data);
+            } else if (expense) {
+              await updateExpense(expense.id, user.id, data);
+            }
+            onClose();
+          } catch (e) {
+            console.error(e);
           }
-          onClose();
         }}
       />
     </Modal>

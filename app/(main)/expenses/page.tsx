@@ -6,14 +6,13 @@ import { ptBR } from "date-fns/locale";
 import { useSession } from "@/contexts/SessionContext";
 import { useExpenses } from "@/contexts/ExpensesContext";
 import type { Expense } from "@/lib/types";
-import { SEED_CATEGORIES } from "@/lib/mocks/seed";
 import { formatBRL } from "@/lib/format";
 import { ExpenseFormModal } from "@/components/expenses/ExpenseFormModal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 
 export default function ExpensesPage() {
   const { user } = useSession();
-  const { listForUser, deleteExpense, cancelRecurring, hydrated } = useExpenses();
+  const { listForUser, deleteExpense, cancelRecurring, hydrated, categories } = useExpenses();
   const [month, setMonth] = useState(() => format(new Date(), "yyyy-MM"));
   const [categoryId, setCategoryId] = useState<string>("");
   const [createOpen, setCreateOpen] = useState(false);
@@ -81,7 +80,7 @@ export default function ExpensesPage() {
             className="min-w-[180px] rounded-xl border border-[var(--border)] bg-background px-3 py-2 text-foreground focus-ring"
           >
             <option value="">Todas</option>
-            {SEED_CATEGORIES.map((c) => (
+            {categories.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
               </option>
@@ -96,7 +95,7 @@ export default function ExpensesPage() {
         ) : (
           <ul className="divide-y divide-[var(--border)]">
             {sorted.map((e) => {
-              const cat = SEED_CATEGORIES.find((c) => c.id === e.categoryId);
+              const cat = categories.find((c) => c.id === e.categoryId);
               return (
                 <li
                   key={e.id}
@@ -168,8 +167,8 @@ export default function ExpensesPage() {
         confirmLabel="Excluir"
         cancelLabel="Voltar"
         variant="danger"
-        onConfirm={() => {
-          if (deleteTarget) deleteExpense(deleteTarget.id, user.id);
+        onConfirm={async () => {
+          if (deleteTarget) await deleteExpense(deleteTarget.id, user.id);
         }}
       />
 
@@ -185,8 +184,8 @@ export default function ExpensesPage() {
         confirmLabel="Desativar repetição"
         cancelLabel="Voltar"
         variant="neutral"
-        onConfirm={() => {
-          if (recurringTarget) cancelRecurring(recurringTarget.id, user.id);
+        onConfirm={async () => {
+          if (recurringTarget) await cancelRecurring(recurringTarget.id, user.id);
         }}
       />
     </div>

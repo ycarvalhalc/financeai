@@ -11,7 +11,7 @@ type ConfirmModalProps = {
   cancelLabel?: string;
   /** danger = excluir / ação destrutiva; neutral = apenas confirmação */
   variant?: "danger" | "neutral";
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
 };
 
 export function ConfirmModal({
@@ -37,8 +37,8 @@ export function ConfirmModal({
         </button>
         <button
           type="button"
-          onClick={() => {
-            onConfirm();
+          onClick={async () => {
+            await Promise.resolve(onConfirm());
             onClose();
           }}
           className={

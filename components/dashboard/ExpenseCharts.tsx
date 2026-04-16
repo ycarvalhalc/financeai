@@ -13,16 +13,15 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import type { Expense } from "@/lib/types";
-import { SEED_CATEGORIES } from "@/lib/mocks/seed";
+import type { Category, Expense } from "@/lib/types";
 import { formatBRL } from "@/lib/format";
 
 type Row = { name: string; value: number; color: string };
 
-function aggregateByCategory(expenses: Expense[]): Row[] {
+function aggregateByCategory(expenses: Expense[], categories: Category[]): Row[] {
   const map = new Map<string, { value: number; color: string }>();
   for (const e of expenses) {
-    const cat = SEED_CATEGORIES.find((c) => c.id === e.categoryId);
+    const cat = categories.find((c) => c.id === e.categoryId);
     const name = cat?.name ?? "Outros";
     const color = cat?.color ?? "#adb5bd";
     const prev = map.get(name) ?? { value: 0, color };
@@ -53,8 +52,14 @@ function ChartTooltip({
   );
 }
 
-export function ExpenseCharts({ expenses }: { expenses: Expense[] }) {
-  const data = useMemo(() => aggregateByCategory(expenses), [expenses]);
+export function ExpenseCharts({
+  expenses,
+  categories,
+}: {
+  expenses: Expense[];
+  categories: Category[];
+}) {
+  const data = useMemo(() => aggregateByCategory(expenses, categories), [expenses, categories]);
 
   if (data.length === 0) {
     return (

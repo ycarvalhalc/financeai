@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "@/contexts/SessionContext";
 import type { AiModelId } from "@/lib/types";
 import { AI_MODEL_IDS } from "@/lib/types";
-import { AI_MODEL_LABELS } from "@/lib/mocks/constants";
+import { AI_MODEL_LABELS } from "@/lib/constants";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -27,9 +27,9 @@ export default function SettingsPage() {
 
   if (!hydrated || !user) return null;
 
-  function handleSave(e: React.FormEvent) {
+  async function handleSave(e: React.FormEvent) {
     e.preventDefault();
-    updateUser({
+    await updateUser({
       name: name.trim(),
       email: email.trim().toLowerCase(),
       avatarUrl: avatarUrl.trim() || undefined,
@@ -43,7 +43,7 @@ export default function SettingsPage() {
     <div className="mx-auto max-w-xl animate-in-up space-y-10">
       <div>
         <h1 className="font-display text-3xl text-foreground">Configurações</h1>
-        <p className="mt-1 text-sm text-muted">Dados pessoais e preferências da IA (armazenamento local mock).</p>
+        <p className="mt-1 text-sm text-muted">Dados pessoais e preferências da IA (conta Supabase).</p>
       </div>
 
       <form

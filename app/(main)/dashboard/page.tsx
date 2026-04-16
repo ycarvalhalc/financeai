@@ -12,7 +12,7 @@ import { formatBRL } from "@/lib/format";
 
 export default function DashboardPage() {
   const { user } = useSession();
-  const { listForUser, hydrated } = useExpenses();
+  const { listForUser, hydrated, categories } = useExpenses();
   const [aiOpen, setAiOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
@@ -70,10 +70,19 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      <ExpenseCharts expenses={monthExpenses} />
-      <RecentExpenses items={recentFive} onNewExpense={() => setCreateOpen(true)} />
+      <ExpenseCharts expenses={monthExpenses} categories={categories} />
+      <RecentExpenses
+        items={recentFive}
+        categories={categories}
+        onNewExpense={() => setCreateOpen(true)}
+      />
 
-      <AiInsightsModal open={aiOpen} onClose={() => setAiOpen(false)} expenses={monthExpenses} />
+      <AiInsightsModal
+        open={aiOpen}
+        onClose={() => setAiOpen(false)}
+        expenses={monthExpenses}
+        categories={categories}
+      />
 
       <ExpenseFormModal
         open={createOpen}

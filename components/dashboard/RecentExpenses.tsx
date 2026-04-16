@@ -3,17 +3,17 @@
 import Link from "next/link";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import type { Expense } from "@/lib/types";
-import { SEED_CATEGORIES } from "@/lib/mocks/seed";
+import type { Category, Expense } from "@/lib/types";
 import { formatBRL } from "@/lib/format";
 
 type Props = {
   items: Expense[];
+  categories: Category[];
   /** Abre o modal de nova despesa (ex.: painel). Se ausente, link para /expenses. */
   onNewExpense?: () => void;
 };
 
-export function RecentExpenses({ items, onNewExpense }: Props) {
+export function RecentExpenses({ items, categories, onNewExpense }: Props) {
   if (items.length === 0) {
     return (
       <div className="rounded-2xl border border-[var(--border)] bg-elevated/40 p-8 text-center text-muted">
@@ -45,7 +45,7 @@ export function RecentExpenses({ items, onNewExpense }: Props) {
       </div>
       <ul className="divide-y divide-[var(--border)]">
         {items.map((e) => {
-          const cat = SEED_CATEGORIES.find((c) => c.id === e.categoryId);
+          const cat = categories.find((c) => c.id === e.categoryId);
           return (
             <li key={e.id} className="flex flex-wrap items-center justify-between gap-2 py-3 first:pt-0">
               <div>
